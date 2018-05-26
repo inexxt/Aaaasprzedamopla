@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://d3js.org/d3-ease.v1.min.js"></script>
+  </head>
+
+  <body>
+    <script>
+      d3.select("body")
+      .append("div")
+      .style("border", "1px black solid")
+      .text("hello world");
+
+      d3.selectAll("div")
+      .style("background-color", "pink")
+      .style("font-size", "24px")
+      .attr("class", "d3div")
+      .on("click", function() {alert("You clicked a div")})
+    </script>
+  </body>
+<html>

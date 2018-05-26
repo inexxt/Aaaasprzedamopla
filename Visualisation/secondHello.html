@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+  </head>
+
+  <body>
+    <!-- <svg style="width:500px; height:500px; border:1px lightgray solid;">
+
+    </svg> -->
+    <script>
+    var width = window.innerWidth,
+    height = window.innerHeight;
+    d3.select("body")
+      .append("svg")
+      .attr("height", height)
+      .attr("width", width)
+
+      d3.select("svg")
+          .append("circle")
+          .attr({"r": 20, "cx": 20, "cy": 20})
+          .style("fill","red");
+
+      d3.select("svg")
+          .append("text")
+          .attr("id","a")
+          .attr({"x": width/4, "y": height/4})
+          .style("opacity", 0)
+          .text("HELLO WORLD");
+
+      d3.select("svg")
+          .append("circle")
+          .attr({"r": 100, "cx": 400, "cy": 400})
+          .style("fill","lightblue");
+
+      d3.select("svg")
+          .append("text")
+          .attr("id","b")
+          .attr({"x": 400, "y": 400})
+          .style("opacity", 0)
+          .text("Uh, hi.");
+
+      d3.select("#a")
+        .transition()
+        .delay(1000)
+        .style("opacity", 1);
+
+      d3.select("#b")
+        .transition()
+        .delay(2000)
+        .style("opacity", .75);
+      d3.selectAll("circle")
+          .transition()
+          .duration(2000)
+          .attr("cy", 200);
+    </script>
+  </body>
+<html>
