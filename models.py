@@ -91,7 +91,11 @@ class Zombie(Agent):
         ZOMBIE_INDEX += 1
 
     def chase_human(self, human):
-        chase_vector = (human.pos - self.pos) / np.linalg.norm(human.pos - self.pos)
+        chase_vector = (human.pos - self.pos)
+        chase_v_norm = np.linalg.norm(human.pos - self.pos)
+        if chase_v_norm > 1:
+            chase_vector /= chase_v_norm
+
         chase_validated = MAP.validate(self.pos, chase_vector)
         power = 1 - np.linalg.norm(chase_validated - self.pos)
         self.update_pos(chase_validated)
