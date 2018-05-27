@@ -47,58 +47,43 @@ for (i = 0; i < 4; i++){
   ctx.fillText(textLabels[i].name, textLabels[i].x, percStartYtext);
 }
 
-var locs = [[[mid.x+150, mid.y+150], [mid.x, mid.y]]];
-
-const numPoints = 1;
-const points = d3.range(numPoints).map(index => ({
-  id: index,
-  color: "red",
-  x: locs[index][0][0],
-  y: locs[index][0][1],
-  iter: 0
-}));
-
-// function gridLayout(points, pointWidth, j) {
-//   const pointHeight = pointWidth;
-//
-//   points.forEach((point, i) => {
-//     point.x = locs[i][j][0];
-//     point.y = locs[i][j][1];
-//   });
-//   return points;
-// }
+pointWidth = 4;
 
 function draw() {
-  for (let i = 0; i < points.length; i++) {
-    const point = points[i];
-    ctx.fillStyle = point.color;
-    ctx.fillRect(point.x, point.y, pointWidth, pointWidth);
+  ctx.clearRect(0, 0, width, height);
+  for (let i = 0; i < humans.length; i++) {
+    const human = humans[i];
+    ctx.fillStyle = "green";
+    ctx.fillRect(human[0], human[1], pointWidth, pointWidth);
   }
-
   ctx.restore();
 }
 
-const pointWidth = 50;
-N = 2;
-let k;
-for (k = 0; k < N; k++){
-  draw();
-  points.forEach((point, i) => {
-    point.x = locs[i][k][0];
-    point.y = locs[i][k][1];
-  });
-};
+function add_points(agents, color){
+  for (let j = 0; j < agents.length; j++) {
+    const agent = agents[j];
+    ctx.fillStyle = color;
+    ctx.fillRect(agent[0], agent[1], pointWidth, pointWidth);
+  };
+}
 
-draw()
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
+async function funkcja() {
+  for (let i = 0; i < locs.length; i++){
+      var humans = locs[i][0];
+      var zombies = locs[i][1];
+      ctx.clearRect(0, 0, mapSize.x, mapSize.y);
+      add_points(zombies, "red")
+      add_points(humans, "lightblue")
+      ctx.restore();
+      await sleep(50);
+  }
 
-
-// draw();
-//
-// gridLayout(points, pointWidth);
-//
-//   // update what is drawn on screen
-// draw();
+}
+funkcja()
 
 // var percents = svg.selectAll("text")
 //                            .data(percents)
