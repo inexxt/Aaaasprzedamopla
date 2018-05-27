@@ -98,7 +98,7 @@ class Agent(object):
     def update_pos(self, pos):
         self.remove_from_grid()
 
-        if MAP.going_out_of_map(pos):
+        if MAP.going_out_of_map((self.pos, pos)):
             self.remove_from_set()
             return
 

@@ -4,6 +4,8 @@ from models import Human, Zombie, ALL_HUMANS, ALL_ZOMBIES, MAP
 import settings
 from itertools import product
 import json
+from tqdm import tqdm
+
 
 import random
 for _ in range(100):
@@ -29,7 +31,7 @@ ts2 = list()
 
 h = 0.5 / (24 * 60)
 
-for t in range(1 * 60):
+for t in tqdm(range(24 * 60)):
     settings.P_ZOMBIE_DIES += h
     humans = list()
     zombies = list()
