@@ -33,5 +33,5 @@ for t in range(60):
     ts.append((humans.copy(), zombies.copy()))
     ts2.append((len(humans), len(zombies)))
 
-with open('ts0', 'w') as outfile:
+with open('Visualisation/ts0.js', 'w') as outfile:
     json.dump(ts, outfile)
