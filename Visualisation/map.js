@@ -1,4 +1,5 @@
-var zoom = 3
+var zoom = 1
+var sleep_time = 1000
 
 var fullPage = {x: innerWidth*zoom, y: innerHeight*zoom};
 var mid = {x: fullPage.x/2, y: fullPage.y/2};
@@ -45,19 +46,30 @@ for (building of buildings["buildings"]){
        .style("strokeWidth", "1px");
     }
 
+var percs = document.getElementById("perc_canvas"),
+    ctx_percs = percs.getContext("2d");
+
+percs.width = innerWidth;
+percs.hight = innerHeight;
+
+ctx_percs.font = (100*zoom).toString +"px Comic Sans MS";
+ctx_percs.fillStyle = "red";
+ctx_percs.textAlign = "center";
+
+ctx_percs.fillText("HELLO", 20, 20);
 
 var percPos = {
-  dead:  mapStart.x + mapSize.x/8,
-  sick: mapStart.x + mapSize.x*(3/8),
-  healthy: mapStart.x + mapSize.x*(5/8),
-  safe: mapStart.x + mapSize.x*(7/8)};
+  dead:  mapStart.x + innerWidth.x/8,
+  sick: mapStart.x + innerWidth.x*(3/8),
+  healthy: mapStart.x + innerWidth.x*(5/8),
+  safe: mapStart.x + innerWidth.x*(7/8)};
 
 
 var textLabels = [
-  {name: "Dead", x: percPos.dead},
-  {name: "Sick", x: percPos.sick},
-  {name: "Healthy", x: percPos.healthy},
-  {name: "Safe", x: percPos.safe}];
+  {"name": "Dead", "x": percPos.dead},
+  {"name": "Sick", "x": percPos.sick},
+  {"name": "Healthy", "x": percPos.healthy},
+  {"name": "Safe", "x": percPos.safe}];
 
 var canvas = document.getElementById("canvas"),
     ctx = canvas.getContext("2d");
@@ -66,26 +78,8 @@ canvas.width = fullPage.x;
 canvas.height = fullPage.y;
 
 
-
-
-//low_canvas.font = "30px Comic Sans MS";
-//low_canvas.fillStyle = "red";
-//low_canvas.textAlign = "center";
-
 pointWidth = 10*zoom;
 
-
-
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let i = 0; i < humans.length; i++) {
-    const human = humans[i];
-    ctx.fillStyle = "green";
-    ctx.fillRect(human[0], human[1], pointWidth, pointWidth);
-  }
-  ctx.restore();
-}
 
 function add_points(agents, color){
   for (let j = 0; j < agents.length; j++) {
@@ -95,6 +89,17 @@ function add_points(agents, color){
   };
 }
 
+function add_percents(perc_dict){
+    var i = 0
+    for (var p in perc_dict){
+        ctx_percs.fillText(perc_dict[p], textLabels[i]["x"], 30)
+        ctx_percs.fillText(textLabels[i]["name"], textLabels[i]["x"], 60)
+        i++;
+    };
+}
+
+add_percents({dead: 30, alive: 40, sick: 30, safe: 40})
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -102,13 +107,12 @@ function sleep(ms) {
 async function plot_points() {
   for (let i = 0; i < locs.length; i++){
       var humans = locs[i][0];
-      console.log(humans)
       var zombies = locs[i][1];
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       add_points(zombies, "red")
       add_points(humans, "lightblue")
       ctx.restore();
-      await sleep(10);
+      await sleep(sleep_time);
   }
 
 }
