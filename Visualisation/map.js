@@ -1,25 +1,49 @@
-var fullPage = {x: innerWidth, y: innerHeight};
+var zoom = 3
+
+var fullPage = {x: innerWidth*zoom, y: innerHeight*zoom};
 var mid = {x: fullPage.x/2, y: fullPage.y/2};
 
-
-const mapSize = {
+var mapSize = {
     x: data["_10"][0] - data["_00"][0],
     y: data["_01"][1] - data["_00"][1]}
 
-console.log(mapSize.x)
-console.log(mapSize.y)
+var part = fullPage.y/mapSize.y
+
+mapSize = {x: mapSize.x*part, y: mapSize.y*part}
 
 var mapStart = {x: mid.x - (mapSize.x/2), y: mid.y - (mapSize.y/2)};
 var percSize = 0.8;
 var percText = 0.1;
 var percStartYtext = (mapSize.y/8)*(1 + percSize);
 
-var Percents = [10, 30, 50];
+function generate_points(p_list){
+    var s = "";
+    for (point of p_list){
+        s += "" + point[0]*part.toString() + " " + (fullPage.y - point[1]*part).toString() + ", ";
+        };
+    return s.slice(0,-1)
+    };
 
-var nof_points = 50;
+//var low_canvas = document.getElementById("low_canvas"),
+//    low_ctx = low_canvas.getContext("2d");
+var low_canvas = d3.select("body")
+   .append("svg")
+   .attr("height", fullPage.y)
+   .attr("width", fullPage.x);
 
-var low_canvas = document.getElementById("low_canvas"),
-    low_ctx = low_canvas.getContext("2d");
+low_canvas.append("polygon")
+   .attr("points", generate_points(data["boundary"]))
+   .style("fill", "green")
+   .style("stroke", "black")
+   .style("strokeWidth", "10px");
+
+for (building of buildings["buildings"]){
+    low_canvas.append("polygon")
+       .attr("points", generate_points(building))
+       .style("fill", "blue")
+       .style("stroke", "black")
+       .style("strokeWidth", "1px");
+    }
 
 
 var percPos = {
@@ -35,20 +59,6 @@ var textLabels = [
   {name: "Healthy", x: percPos.healthy},
   {name: "Safe", x: percPos.safe}];
 
-low_canvas.width = fullPage.x;
-low_canvas.height = fullPage.y;
-
-var background = new Image();
-background.src = "mapa_poznania.jpg";
-
-background.onload = function(){
- low_ctx.drawImage(background,mapStart.x,mapStart.y);
- var i;
- for (i = 0; i < 4; i++){
-    low_ctx.fillText(textLabels[i].name, textLabels[i].x, percStartYtext);
-  }
-}
-
 var canvas = document.getElementById("canvas"),
     ctx = canvas.getContext("2d");
 
@@ -58,11 +68,14 @@ canvas.height = fullPage.y;
 
 
 
-low_ctx.font = "30px Comic Sans MS";
-low_ctx.fillStyle = "red";
-low_ctx.textAlign = "center";
+//low_canvas.font = "30px Comic Sans MS";
+//low_canvas.fillStyle = "red";
+//low_canvas.textAlign = "center";
 
-pointWidth = 4;
+pointWidth = 10*zoom;
+
+
+
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -78,7 +91,7 @@ function add_points(agents, color){
   for (let j = 0; j < agents.length; j++) {
     const agent = agents[j];
     ctx.fillStyle = color;
-    ctx.fillRect(agent[0], agent[1], pointWidth, pointWidth);
+    ctx.fillRect(agent[0]*part, agent[1]*part, pointWidth, pointWidth);
   };
 }
 
@@ -89,12 +102,13 @@ function sleep(ms) {
 async function plot_points() {
   for (let i = 0; i < locs.length; i++){
       var humans = locs[i][0];
+      console.log(humans)
       var zombies = locs[i][1];
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       add_points(zombies, "red")
       add_points(humans, "lightblue")
       ctx.restore();
-      await sleep(50);
+      await sleep(10);
   }
 
 }

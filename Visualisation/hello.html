@@ -1,21 +1,27 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="https://d3js.org/d3-ease.v1.min.js"></script>
-  </head>
+<head>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3-ease.v1.min.js"></script>
+<script src="https://d3js.org/d3-timer.v1.min.js"></script>
 
+  <meta charset="utf-8">
+  <title>Zombie map</title>
+</head>
   <body>
+      <!--<svg id="low_canvas"-->
+       <!--style="position: absolute; left: 0; top: 0; z-index: 0;"></svg>-->
     <script>
-      d3.select("body")
-      .append("div")
-      .style("border", "1px black solid")
-      .text("hello world");
+    var canvas = d3.select("body")
+   .append("svg");
+   <!--.attr("height", 600)-->
+   <!--.attr("width", 600);-->
 
-      d3.selectAll("div")
-      .style("background-color", "pink")
-      .style("font-size", "24px")
-      .attr("class", "d3div")
-      .on("click", function() {alert("You clicked a div")})
+canvas.append("polygon")
+   .attr("points", "200,10 250,190 160,210")
+   .style("fill", "green")
+   .style("stroke", "black")
+   .style("strokeWidth", "10px");
     </script>
   </body>
 <html>
