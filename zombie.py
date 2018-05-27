@@ -37,4 +37,4 @@ for t in range(24 * 60):
     ts2.append((len(humans), len(zombies)))
 
 with open('Visualisation/ts0.js', 'w') as outfile:
-    outfile.write("locs = " + json.dumps(ts))
+    outfile.write(f"locs = {json.dumps(ts)}\n")
