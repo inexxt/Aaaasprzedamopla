@@ -6,10 +6,10 @@ from itertools import product
 import json
 
 import random
-for _ in range(100):
+for _ in range(1000):
     Human((random.random()*settings.MAP_SIZE_X, random.random()*settings.MAP_SIZE_Y))
 
-for _ in range(100):
+for _ in range(300):
     Zombie((random.random()*settings.MAP_SIZE_X, random.random()*settings.MAP_SIZE_Y))
 
 grid_iter = list(
@@ -21,7 +21,10 @@ grid_iter = list(
 ts = list()
 ts2 = list()
 
-for t in range(60):
+h = 0.5 / (24 * 60)
+
+for t in range(24 * 60):
+    settings.P_ZOMBIE_DIES += h
     humans = list()
     zombies = list()
     for zombie in ALL_ZOMBIES.copy():
@@ -34,4 +37,4 @@ for t in range(60):
     ts2.append((len(humans), len(zombies)))
 
 with open('Visualisation/ts0.js', 'w') as outfile:
-    json.dump(ts, outfile)
+    outfile.write("locs = " + json.dumps(ts))
