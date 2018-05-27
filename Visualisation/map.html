@@ -9,7 +9,12 @@
   <title>Zombie map</title>
 </head>
 <body>
-  <canvas id="canvas"/>
+  <div style="position: relative;">
+    <canvas id="canvas"
+       style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+    <canvas id="low_canvas"
+       style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+</div>
   <script src="ts0.js"></script>
   <script src="map.js"></script>
 </body>

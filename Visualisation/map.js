@@ -11,20 +11,24 @@ var t = 20;
 
 var nof_points = 50;
 
+var low_canvas = document.getElementById("low_canvas"),
+    low_ctx = low_canvas.getContext("2d");
+
+low_canvas.width = fullPage.x;
+low_canvas.height = fullPage.y;
+
+var background = new Image();
+background.src = "mapa_poznania.jpg";
+
+background.onload = function(){
+ low_ctx.drawImage(background,mapStart.x,mapStart.y);
+}
 
 var canvas = document.getElementById("canvas"),
     ctx = canvas.getContext("2d");
 
 canvas.width = fullPage.x;
 canvas.height = fullPage.y;
-
-
-// var background = new Image();
-// background.src = "mapa_poznania.jpg";
-//
-// background.onload = function(){
-//     ctx.drawImage(background,mapStart.x,mapStart.y);
-// }
 
 var percPos = {
   dead:  mapStart.x + mapSize.x/8,
@@ -38,13 +42,13 @@ var textLabels = [
   {name: "Healthy", x: percPos.healthy},
   {name: "Safe", x: percPos.safe}];
 
-ctx.font = "30px Comic Sans MS";
-ctx.fillStyle = "red";
-ctx.textAlign = "center";
+low_ctx.font = "30px Comic Sans MS";
+low_ctx.fillStyle = "red";
+low_ctx.textAlign = "center";
 
 var i;
 for (i = 0; i < 4; i++){
-  ctx.fillText(textLabels[i].name, textLabels[i].x, percStartYtext);
+  low_ctx.fillText(textLabels[i].name, textLabels[i].x, percStartYtext);
 }
 
 pointWidth = 4;
