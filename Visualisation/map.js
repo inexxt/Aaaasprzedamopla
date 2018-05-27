@@ -6,13 +6,25 @@ var percSize = 0.8;
 var percText = 0.1;
 var percStartYtext = (mapSize.y/8)*(1 + percSize);
 
-var Percents = {dead: 10, sick: 30, healthy: 50, safe: 10};
-var t = 20;
+var Percents = [10, 30, 50];
 
 var nof_points = 50;
 
 var low_canvas = document.getElementById("low_canvas"),
     low_ctx = low_canvas.getContext("2d");
+
+var percPos = {
+  dead:  mapStart.x + mapSize.x/8,
+  sick: mapStart.x + mapSize.x*(3/8),
+  healthy: mapStart.x + mapSize.x*(5/8),
+  safe: mapStart.x + mapSize.x*(7/8)};
+
+
+var textLabels = [
+  {name: "Dead", x: percPos.dead},
+  {name: "Sick", x: percPos.sick},
+  {name: "Healthy", x: percPos.healthy},
+  {name: "Safe", x: percPos.safe}];
 
 low_canvas.width = fullPage.x;
 low_canvas.height = fullPage.y;
@@ -22,6 +34,10 @@ background.src = "mapa_poznania.jpg";
 
 background.onload = function(){
  low_ctx.drawImage(background,mapStart.x,mapStart.y);
+ var i;
+ for (i = 0; i < 4; i++){
+    low_ctx.fillText(textLabels[i].name, textLabels[i].x, percStartYtext);
+  }
 }
 
 var canvas = document.getElementById("canvas"),
@@ -30,26 +46,12 @@ var canvas = document.getElementById("canvas"),
 canvas.width = fullPage.x;
 canvas.height = fullPage.y;
 
-var percPos = {
-  dead:  mapStart.x + mapSize.x/8,
-  sick: mapStart.x + mapSize.x*(3/8),
-  healthy: mapStart.x + mapSize.x*(5/8),
-  safe: mapStart.x + mapSize.x*(7/8)};
 
-var textLabels = [
-  {name: "Dead", x: percPos.dead},
-  {name: "Sick", x: percPos.sick},
-  {name: "Healthy", x: percPos.healthy},
-  {name: "Safe", x: percPos.safe}];
+
 
 low_ctx.font = "30px Comic Sans MS";
 low_ctx.fillStyle = "red";
 low_ctx.textAlign = "center";
-
-var i;
-for (i = 0; i < 4; i++){
-  low_ctx.fillText(textLabels[i].name, textLabels[i].x, percStartYtext);
-}
 
 pointWidth = 4;
 
@@ -87,6 +89,9 @@ async function funkcja() {
   }
 
 }
+
+
+
 funkcja()
 
 // var percents = svg.selectAll("text")
