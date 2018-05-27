@@ -31,17 +31,35 @@ ts2 = list()
 
 h = 0.5 / (24 * 60)
 
+import multiprocessing as mp
+from helpers import flatten
+
+
+def parmap(f, ll):
+    with mp.Pool(processes=mp.cpu_count()) as p:
+        ret = p.map(f, ll)
+    return ret
+
+
 for t in tqdm(range(24 * 60)):
-    settings.P_ZOMBIE_DIES += h
-    humans = list()
-    zombies = list()
-    for zombie in ALL_ZOMBIES.copy():
-        zombies.append(tuple(zombie.pos))
-        zombie.update()
-    for human in ALL_HUMANS.copy():
-        humans.append(tuple(human.pos))
-        human.update()
-    ts.append((humans.copy(), zombies.copy()))
+    # settings.P_ZOMBIE_DIES += h # Temporarliy turned off - modification of state
+    # HISTORY BOOKKEEPING
+    humans = [tuple(x.pos) for x in ALL_HUMANS]
+    zombies = [tuple(x.pos) for x in ALL_ZOMBIES]
+    ts.append((humans, zombies))
+
+    def upd(x):
+        x.update()
+    zz = ALL_ZOMBIES.copy()
+    hh = ALL_HUMANS.copy()
+    parmap(upd, zz)
+    parmap(upd, hh)
+
+    for z in zz:
+        z.unremove_from_grid()
+    for h in hh:
+        h.unremove_from_grid()
+
     ts2.append(dict(humans=len(humans), zombies=len(zombies), all=len(humans)+len(zombies)))
 
 with open('Visualisation/ts0.js', 'w') as outfile:

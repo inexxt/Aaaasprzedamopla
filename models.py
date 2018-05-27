@@ -75,14 +75,23 @@ class Agent(object):
         self.add_to_set()
         self.grid_x, self.grid_y = MAP.get_square(pos)
         self.attach_to_grid()
+        self.removed_from_grid = False
+        self.past_grid = (-1, -1)
 
     def attach_to_grid(self):
         pass
 
+    def unremove_from_grid(self):
+        self.removed_from_grid = False
+
     def remove_from_grid(self):
-        pass
+        self.removed_from_grid = True
+        self.past_grid = (self.grid_x, self.grid_y)
 
     def add_to_set(self):
+        pass
+
+    def true_remove_from_grid(self):
         pass
 
     def remove_from_set(self):
@@ -154,7 +163,15 @@ class Zombie(Agent):
     def attach_to_grid(self):
         ZOMBIES_GRID[self.grid_x, self.grid_y].add(self)
 
-    def remove_from_grid(self):
+    # def remove_from_grid(self):
+    #     pass
+
+    def unremove_from_grid(self):
+        super().unremove_from_grid()
+        if self.past_grid != (-1, -1):
+            ZOMBIES_GRID[self.past_grid[0], self.past_grid[1]].remove(self)
+
+    def true_remove_from_grid(self):
         ZOMBIES_GRID[self.grid_x, self.grid_y].remove(self)
 
     def update(self):
@@ -167,6 +184,8 @@ class Zombie(Agent):
         # Okoliczne kwadraciki.
         for gx, gy in self.adjacent_squares():
             potential_humans |= HUMANS_GRID[gx, gy]
+
+        potential_humans = list(filter(lambda x: not x.removed_from_grid, potential_humans))
 
         if potential_humans:
             human = min(potential_humans, key=lambda h: self.dist(h))
@@ -182,8 +201,9 @@ class Zombie(Agent):
         potential_zombies = set()
         for gx, gy in self.adjacent_squares():
             potential_zombies |= ZOMBIES_GRID[gx, gy]
-        nof_humans = len(list(filter(lambda h: self.dist(h) <= settings.ZOMBIE_FIGHT, potential_humans)))
-        nof_zombies = len(list(filter(lambda z: self.dist(z) <= settings.ZOMBIE_FIGHT, potential_zombies)))
+
+        nof_humans = len(list(filter(lambda h: self.dist(h) <= settings.ZOMBIE_FIGHT and not h.removed_from_grid, potential_humans)))
+        nof_zombies = len(list(filter(lambda z: self.dist(z) <= settings.ZOMBIE_FIGHT and not z.removed_from_grid, potential_zombies)))
 
         if nof_zombies != 0:
             p_zombie_dies = settings.P_ZOMBIE_DIES * (nof_humans / nof_zombies)
@@ -212,7 +232,14 @@ class Human(Agent):
     def attach_to_grid(self):
         HUMANS_GRID[self.grid_x, self.grid_y].add(self)
 
-    def remove_from_grid(self):
+    def unremove_from_grid(self):
+        super().unremove_from_grid()
+        if self.past_grid != (-1, -1):
+            HUMANS_GRID[self.past_grid[0], self.past_grid[1]].remove(self)
+    # def remove_from_grid(self):
+    #     pass
+
+    def true_remove_from_grid(self):
         HUMANS_GRID[self.grid_x, self.grid_y].remove(self)
 
     def add_to_set(self):
@@ -235,6 +262,8 @@ class Human(Agent):
         # Okoliczne kwadraciki.
         for gx, gy in self.adjacent_squares():
             potential_zombies |= ZOMBIES_GRID[gx, gy]
+
+        potential_zombies = list(filter(lambda x: not x.removed_from_grid, potential_zombies))
 
         if potential_zombies:
             zombie = min(potential_zombies, key=lambda z: self.dist(z))
