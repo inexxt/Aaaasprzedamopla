@@ -3,6 +3,7 @@ sys.path.append("/home/kajetan/Aaaasprzedamopla")
 from models import Human, Zombie, ALL_HUMANS, ALL_ZOMBIES
 import settings
 from itertools import product
+import json
 
 import random
 for _ in range(100):
@@ -32,3 +33,5 @@ for t in range(60):
     ts.append((humans.copy(), zombies.copy()))
     ts2.append((len(humans), len(zombies)))
 
+with open('ts0', 'w') as outfile:
+    json.dump(ts, outfile)
