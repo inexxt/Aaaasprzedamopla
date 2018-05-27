@@ -176,3 +176,27 @@ class Human(Agent):
 
     def remove_from_set(self):
         ALL_HUMANS.remove(self)
+
+    def run_away(self, zombie):
+        chase_vector = 2 * (-(zombie.pos - self.pos) / np.linalg.norm(zombie.pos - self.pos))
+
+        chase_validated = MAP.validate(self.pos, chase_vector)
+        power = 2 - np.linalg.norm(chase_validated - self.pos)
+        self.update_pos(chase_validated)
+        self.random_walk(power=power / 2)  # zderzenie z przeszkodą
+
+    def update(self):
+        potential_zombies = set()
+
+        # Okoliczne kwadraciki.
+        for gx, gy in self.adjacent_squares():
+            potential_zombies |= ZOMBIES_GRID[gx, gy]
+
+        if potential_zombies:
+            zombie = min(potential_zombies, key=lambda z: self.dist(z))
+            if self.dist(zombie) > settings.ZOMBIE_PROXIMITY:
+                self.random_walk()
+            elif self.dist(zombie) > settings.ZOMBIE_FIGHT:
+                self.run_away(zombie)
+
+        self.random_walk()
