@@ -1,6 +1,14 @@
 var fullPage = {x: innerWidth, y: innerHeight};
 var mid = {x: fullPage.x/2, y: fullPage.y/2};
-var mapSize = {x: 1280, y: 812};
+
+
+const mapSize = {
+    x: data["_10"][0] - data["_00"][0],
+    y: data["_01"][1] - data["_00"][1]}
+
+console.log(mapSize.x)
+console.log(mapSize.y)
+
 var mapStart = {x: mid.x - (mapSize.x/2), y: mid.y - (mapSize.y/2)};
 var percSize = 0.8;
 var percText = 0.1;
@@ -12,6 +20,7 @@ var nof_points = 50;
 
 var low_canvas = document.getElementById("low_canvas"),
     low_ctx = low_canvas.getContext("2d");
+
 
 var percPos = {
   dead:  mapStart.x + mapSize.x/8,
@@ -56,7 +65,7 @@ low_ctx.textAlign = "center";
 pointWidth = 4;
 
 function draw() {
-  ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let i = 0; i < humans.length; i++) {
     const human = humans[i];
     ctx.fillStyle = "green";
@@ -77,11 +86,11 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function funkcja() {
+async function plot_points() {
   for (let i = 0; i < locs.length; i++){
       var humans = locs[i][0];
       var zombies = locs[i][1];
-      ctx.clearRect(0, 0, mapSize.x, mapSize.y);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       add_points(zombies, "red")
       add_points(humans, "lightblue")
       ctx.restore();
@@ -91,8 +100,7 @@ async function funkcja() {
 }
 
 
-
-funkcja()
+plot_points()
 
 // var percents = svg.selectAll("text")
 //                            .data(percents)
