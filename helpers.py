@@ -1,3 +1,7 @@
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
+
+
 def flatten(ll):
     return [x for l in ll for x in l]
 
@@ -11,6 +15,16 @@ def mean(ll):
     assert len(xs(ll)) == len(ys(ll))
     return sum(xs(ll))/len(ll), sum(ys(ll))/len(ll)
 
+
+def going_out_of_poly(xy, p):
+    for ab in zip(p + [p[0]], [p[-1]] + p):
+        if intersect(xy, ab):
+            return True
+    return False
+
+def out_of_poly(xy, p):
+    poly = Polygon(p)
+    return not poly.contains(Point(xy[0], xy[1]))
 
 def alpha_beta(a, b):
     (p1, q1) = a

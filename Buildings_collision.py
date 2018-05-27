@@ -60,11 +60,23 @@ def solution(a, b):
     ysol = alpha1 * xsol + beta1
     return xsol, ysol
 
+def going_out_of_poly(xy, p):
+    for ab in zip(p + [p[0]], [p[-1]] + p):
+        if intersect(xy, ab):
+            return True
+    return False
+
+def out_of_poly(xy, p):
+    poly = Polygon(p)
+    return not poly.contains(Point(xy[0], xy[1]))
 
 class Buildings_collision:
-    def __init__(self, fname="./buildings_backup.json"):
-        with open(fname, "r") as f:
+    def __init__(self, buildings_fname="./buildings_backup.json", map_fname="./polygon_poznan_meters.json"):
+        with open(buildings_fname, "r") as f:
             buildings = json.load(f)
+        with open(map_fname, "r") as f:
+            self.map_poly = json.load(f)["boundary"]
+
         self.buildings_dict = {mean(x): x for x in buildings}
         self.bmeans = list(self.buildings_dict.keys())
         self.tree = KDTree(list(self.bmeans))
@@ -79,6 +91,12 @@ class Buildings_collision:
             if poly.contains(point):
                 return p
         return None
+
+    def out_of_map(self, xy):
+        return out_of_poly(xy, self.map_poly)
+
+    def going_out_of_map(self, xy):
+        return going_out_of_poly(xy, self.map_poly)
 
     def ask_intersection(self, starting_point, finish_point):
         sp = (starting_point, finish_point)

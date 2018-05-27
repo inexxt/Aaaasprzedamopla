@@ -14,10 +14,13 @@ ZOMBIE_INDEX = 1
 
 
 class Map(object):
-    def __init__(self, fname="./buildings_backup_meters.json"):
+    def __init__(self, fname="./buildings_backup_meters.json", map_fname="./polygon_poznan_meters.json"):
         with open(fname, "r") as f:
             b_backup = json.load(f)
             buildings = b_backup['buildings']
+        with open(map_fname, "r") as f:
+            self.map_poly = json.load(f)["boundary"]
+
         self.width, self.height = b_backup["_11"]
         self.buildings_dict = {helpers.mean(x): x for x in buildings}
         self.bmeans = list(self.buildings_dict.keys())
@@ -32,6 +35,12 @@ class Map(object):
             if poly.contains(point):
                 return True
         return False
+
+    def out_of_map(self, xy):
+        return helpers.out_of_poly(xy, self.map_poly)
+
+    def going_out_of_map(self, xy):
+        return helpers.going_out_of_poly(xy, self.map_poly)
 
     def validate(self, pos, vector):
         finish_point = pos + vector
@@ -59,7 +68,7 @@ ALL_ZOMBIES = set()
 
 class Agent(object):
     def __init__(self, pos):
-        if type(pos) != np.ndarray:
+        if not isinstance(pos, np.ndarray):
             self.pos = np.array(pos)
         else:
             self.pos = pos
@@ -88,10 +97,16 @@ class Agent(object):
 
     def update_pos(self, pos):
         self.remove_from_grid()
-        if type(pos) != np.ndarray:
+
+        if MAP.going_out_of_map(pos):
+            self.remove_from_set()
+            return
+
+        if not isinstance(pos, np.ndarray):
             self.pos = np.array(pos)
         else:
             self.pos = pos
+
         self.grid_x, self.grid_y = MAP.get_square(pos)
         self.attach_to_grid()
 
@@ -114,10 +129,10 @@ class Agent(object):
 class Zombie(Agent):
     def __init__(self, pos):
         super().__init__(pos)
-        self.age = 0
-        global ZOMBIE_INDEX
-        self.name = f"Zombie {ZOMBIE_INDEX}"
-        ZOMBIE_INDEX += 1
+        self.age = random.choice(range(settings.ZOMBIE_MAX_AGE))
+        # global ZOMBIE_INDEX
+        # self.name = f"Zombie {ZOMBIE_INDEX}"
+        # ZOMBIE_INDEX += 1
 
     def chase_human(self, human):
         chase_vector = (human.pos - self.pos)
@@ -167,8 +182,8 @@ class Zombie(Agent):
         potential_zombies = set()
         for gx, gy in self.adjacent_squares():
             potential_zombies |= ZOMBIES_GRID[gx, gy]
-        nof_humans = sum(map(lambda h: self.dist(h) <= settings.ZOMBIE_FIGHT, potential_humans))
-        nof_zombies = sum(map(lambda z: self.dist(z) <= settings.ZOMBIE_FIGHT, potential_zombies))
+        nof_humans = len(list(filter(lambda h: self.dist(h) <= settings.ZOMBIE_FIGHT, potential_humans)))
+        nof_zombies = len(list(filter(lambda z: self.dist(z) <= settings.ZOMBIE_FIGHT, potential_zombies)))
 
         if nof_zombies != 0:
             p_zombie_dies = settings.P_ZOMBIE_DIES * (nof_humans / nof_zombies)
@@ -190,9 +205,9 @@ class Zombie(Agent):
 class Human(Agent):
     def __init__(self, pos):
         super().__init__(pos)
-        global HUMAN_INDEX
-        self.name = f"Human {HUMAN_INDEX}"
-        HUMAN_INDEX += 1
+        # global HUMAN_INDEX
+        # self.name = f"Human {HUMAN_INDEX}"
+        # HUMAN_INDEX += 1
 
     def attach_to_grid(self):
         HUMANS_GRID[self.grid_x, self.grid_y].add(self)
