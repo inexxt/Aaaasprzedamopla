@@ -86,7 +86,6 @@ class Buildings_collision:
         for k in ks[1]:
             p = self.buildings_dict[self.bmeans[k]]
             for ab in zip(p + [p[0]], [p[-1]] + p):
-                print(ab)
                 if intersect(sp, ab):
                     return solution(sp, ab)
         return None

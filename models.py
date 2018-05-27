@@ -1,26 +1,55 @@
 import numpy as np
 import random
+import json
+
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
+from scipy.spatial import KDTree
+
 import settings
+import helpers
 
 HUMAN_INDEX = 1
 ZOMBIE_INDEX = 1
 
+
 class Map(object):
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
+    def __init__(self, fname="./buildings_backup_meters.json"):
+        with open(fname, "r") as f:
+            b_backup = json.load(f)
+            buildings = b_backup['buildings']
+        self.width, self.height = b_backup["_11"]
+        self.buildings_dict = {helpers.mean(x): x for x in buildings}
+        self.bmeans = list(self.buildings_dict.keys())
+        self.tree = KDTree(list(self.bmeans))
+
+    def does_collide(self, finish_point):
+        ks = self.tree.query(finish_point, k=5)
+        for k in ks[1]:
+            p = self.buildings_dict[self.bmeans[k]]
+            poly = Polygon(p)
+            point = Point(finish_point[0], finish_point[1])
+            if poly.contains(point):
+                return True
+        return False
 
     def validate(self, pos, vector):
-        return pos+vector
-        # if mozna przejsc z pos do pos + vector to zwroc pos + vector
-        # else zwroc przeciecie tej sciezki z napotkaną przeszkodą
+        finish_point = pos + vector
+        sp = (pos, finish_point)
+        ks = self.tree.query(finish_point, k=5)
+        for k in ks[1]:
+            p = self.buildings_dict[self.bmeans[k]]
+            for ab in zip(p + [p[0]], [p[-1]] + p):
+                if helpers.intersect(sp, ab):
+                    return helpers.solution(sp, ab)
+        return finish_point
 
     def get_square(self, pos):
         return max(0, min(int(settings.GRID_SIZE_X * (pos[0] / self.width)), settings.GRID_SIZE_X - 1)),\
                max(0, min(int(settings.GRID_SIZE_Y * (pos[1] / self.height)), settings.GRID_SIZE_Y - 1))
 
 
-MAP = Map(settings.MAP_SIZE_X, settings.MAP_SIZE_Y)
+MAP = Map()
 
 HUMANS_GRID = np.array([[set() for _ in range(settings.GRID_SIZE_X)] for __ in range(settings.GRID_SIZE_Y)])
 ZOMBIES_GRID = np.array([[set() for _ in range(settings.GRID_SIZE_X)] for __ in range(settings.GRID_SIZE_Y)])
